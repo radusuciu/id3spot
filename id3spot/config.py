@@ -1,8 +1,10 @@
-import yaml
 import pathlib
+import yaml
+import os
 
-_secrets_path = pathlib.Path('secrets.yml')
-_override_path = pathlib.Path('secrets.override.yml')
+PROJECT_HOME_PATH = pathlib.Path(os.path.realpath(__file__)).parent
+_secrets_path = PROJECT_HOME_PATH.joinpath('secrets.yml')
+_override_path =PROJECT_HOME_PATH.joinpath('secrets.override.yml')
 
 # get secrets
 with _secrets_path.open() as f:
