@@ -1,5 +1,8 @@
 # id3spot
 
+A small script which uses data from Spotify to write id3 tags to mp3 files. I use it like so: `python id3spot.py -x *.mp3`.
+
+#### Help Text:
 ```
 Usage: id3spot.py [OPTIONS] [FILES]...
 
