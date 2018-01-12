@@ -1,0 +1,6 @@
+click
+colorama
+eyed3
+requests
+spotipy
+yaml
