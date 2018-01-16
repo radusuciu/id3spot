@@ -170,7 +170,7 @@ def process(file, query, replace, rename, analyze, dry_run, magic, prompt, verbo
     if not dry_run:
         tag.save(str(path))
 
-    new_name = TagTemplate(rename).substitute(tag, zeropad=True) if rename else None
+    new_name = TagTemplate(rename).substitute(tag, zeropad=True).replace('?', '') if rename else None
 
     if rename and not dry_run:
         try:
