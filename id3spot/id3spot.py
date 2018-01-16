@@ -86,7 +86,7 @@ def search_spotify(term):
     }
 
 
-def perform_search(term):
+def perform_search(term, alternative=None):
     result = search_spotify(term)
 
     # if we don't find any result, attempt to simplify query by removing
@@ -97,6 +97,9 @@ def perform_search(term):
         while brackets and not result:
             term = term.replace(brackets.pop(), '')
             result = search_spotify(term)
+
+    if alternative and not result:
+        result = perform_search(alternative)
 
     return result
 
@@ -116,12 +119,14 @@ def process(file, query, replace, rename, analyze, dry_run, magic, prompt, verbo
     path = pathlib.Path(file).absolute()
     audio_file = eyed3.load(str(path))
     tag = audio_file.tag
+    alternative_term = None
 
     if query:
         search_term = query
     elif tag and tag.artist and tag.title:
         # prefer to use existing tags and fall back to filename
         search_term = '{} {}'.format(tag.artist, tag.title)
+        alternative_term = path.stem
     else:
         search_term = path.stem
 
@@ -136,7 +141,13 @@ def process(file, query, replace, rename, analyze, dry_run, magic, prompt, verbo
 
     # tag_data contains items that directly map to id3 tags
     # stuff in meta requires some processing
-    tag_data, meta = perform_search(search_term)
+    click.echo(search_term)
+
+    try:
+        tag_data, meta = perform_search(search_term, alternative_term)
+    except Exception as e:
+        click.echo('Failed search for {}'.format(search_term))
+        return False
 
     if prompt and search_term != '{} {}'.format(tag_data['artist'], tag_data['title']):
         click.echo('File: {}'.format(audio_file.path))
