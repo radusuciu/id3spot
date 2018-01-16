@@ -72,7 +72,7 @@ def search_spotify(term):
         'title': title,
         # 'track_num': (track['track_number'], album['tracks']['total']),
         'track_num': track['track_number'],
-        'artist': '/'.join(a['name'] for a in track['artists']),
+        'artist': ', '.join(a['name'] for a in track['artists']),
         'album_artist': ', '.join(a['name'] for a in album['artists']),
         'album': track['album']['name'],
         # 'disc_num': track['disc_number'],
