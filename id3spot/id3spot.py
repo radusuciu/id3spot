@@ -65,7 +65,7 @@ def search_spotify(term):
     total_discs = last_tracks['items'][-1]['disc_number']
 
     # spotify likes to use dashes instead of parentheses for remixes
-    title = re.sub('\s-\s([\w\.\?]+?\sremix)$', ' (\g<1>)', track['name'], flags=re.I)
+    title = re.sub('\s-\s([\w\.\?\&\s]+?\smix)$', ' (\g<1>)', track['name'], flags=re.I)
 
     # returning tuple of dicts (tag_data, meta)
     return {
