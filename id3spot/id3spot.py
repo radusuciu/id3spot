@@ -4,6 +4,8 @@ from eyed3.id3.tag import TagTemplate
 from eyed3.utils.console import printError, printWarning, AnsiCodes
 from eyed3.plugins.classic import ARGS_HELP
 from eyed3.utils.log import log
+import fuzzywuzzy
+import fuzzywuzzy.process
 import config
 import logging
 import pathlib
@@ -23,6 +25,7 @@ client_credentials_manager = SpotifyClientCredentials(
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 AnsiCodes.init(True)
+# @click.option('--url', '-u', help='Specify track url to use for retag')
 
 @click.command()
 @click.option('--query', '-q',  help='Specify a query to use when searching for a matching track.')
@@ -46,9 +49,29 @@ def main(files, **kwargs):
         process(file, **kwargs)
 
 
+def get_closest_match(term, results):
+    def processor(track):
+        if type(track) == str:
+            return track
+        artists = ', '.join(a['name'] for a in track['artists'])
+        title = re.sub('\s-\s([\w\.\?\&\s]+?\smix)$', ' (\g<1>)', track['name'], flags=re.I)
+        return '{} - {}'.format(artists, title)
+    matches = fuzzywuzzy.process.extractBests(
+        term,
+        results,
+        processor=processor,
+        scorer=fuzzywuzzy.fuzz.partial_token_sort_ratio,
+        score_cutoff=25
+    )
+    return matches[0][0]
+
+
 def search_spotify(term):
     try:
-        track = sp.search(term, type='track', limit=1)['tracks']['items'][0]
+        track = get_closest_match(
+            term, 
+            sp.search(term, type='track', limit=5)['tracks']['items']
+        )
     except:
         track = None
 
